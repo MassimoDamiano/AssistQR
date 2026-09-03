@@ -1,6 +1,6 @@
 @AssistQR.Api_HostAddress = http://localhost:5169
 
-GET {{AssistQR.Api_HostAddress}}/weatherforecast/
+GET {{AssistQR.Api_HostAddress}}/api/v1/health
 Accept: application/json
 
 ###
