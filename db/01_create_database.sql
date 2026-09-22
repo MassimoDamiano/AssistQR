@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS db_asistqr;
+CREATE DATABASE IF NOT EXISTS db_assistqr;
 USE db_assistqr;
 
 /* USUARIOS */
