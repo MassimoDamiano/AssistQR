@@ -13,12 +13,21 @@ var connection = builder.Configuration.GetConnectionString("AssistQrDb")??
     throw new InvalidOperationException("Connection string 'AssistQrDb' is not found.");
 builder.Services.AddMySqlDataSource(connection);
 
-// Add repository
+// Add repositorys
+
 builder.Services.AddScoped<AssistQR.Api.Repositories.Interfaces.ISubjectRepository, 
     AssistQR.Api.Repositories.SubjectRepository>();
-
 builder.Services.AddScoped<AssistQR.Api.Services.SubjectService>();
 builder.Services.AddScoped<AssistQR.Api.Services.Interfaces.ISubjectService, AssistQR.Api.Services.SubjectService>();
+
+builder.Services.AddScoped<AssistQR.Api.Repositories.Interfaces.IAuthUserRepository,
+    AssistQR.Api.Repositories.AuthUserRepository>();
+builder.Services.AddScoped<AssistQR.Api.Services.Interfaces.IAuthService, AssistQR.Api.Services.AuthService>();
+
+builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IPasswordHasher<AssistQR.Api.Models.AuthUser>,
+    Microsoft.AspNetCore.Identity.PasswordHasher<AssistQR.Api.Models.AuthUser>>();
+
+
 
 var app = builder.Build();
 
