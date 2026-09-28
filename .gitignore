@@ -3,8 +3,18 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-# dotenv files
+# Local configuration and secrets
 .env
+.env.*
+!.env.example
+**/secrets.json
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+**/google-services.json
+**/GoogleService-Info.plist
+*.pem
+*.key
+*.p12
 
 # User-specific files
 *.rsuser
@@ -22,6 +32,8 @@ mono_crash.*
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
+!frontend/assistqr/android/app/src/debug/
+!frontend/assistqr/android/app/src/debug/AndroidManifest.xml
 [Rr]elease/
 [Rr]eleases/
 x64/
