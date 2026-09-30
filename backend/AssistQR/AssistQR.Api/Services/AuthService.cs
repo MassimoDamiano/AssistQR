@@ -3,6 +3,7 @@ using AssistQR.Api.DTOs.Auth;
 using AssistQR.Api.Models;
 using AssistQR.Api.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using AssistQR.Api.DTOs;
 
 namespace AssistQR.Api.Services
 {
@@ -26,7 +27,26 @@ namespace AssistQR.Api.Services
 
             var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, request.Password);
             if (passwordVerificationResult == PasswordVerificationResult.Failed) return null;
-            return new AuthenticatedUser { Id = user.Id, Email = user.Email, Role = user.Role };
+            return new AuthenticatedUser { Id = user.Id, FirstName = user.FirstName, LastName = user.LastName, Email = user.Email, Role = user.Role };
+        }
+
+        public async Task<UserResponse?> RegisterStudentAsync(RegisterRequest request, CancellationToken cancellationToken)
+        {
+           
+            var existingUser = await repo.FindByEmailAsync(request.Email, cancellationToken);
+            if (existingUser != null)
+            {
+                return null;
+            }
+            var passwordHash = passwordHasher.HashPassword(null!, request.Password);
+
+            var userId = await repo.CreateStudentAsync(request.FirstName, request.LastName, request.Email, passwordHash, cancellationToken);
+            if (userId == null)
+            {
+                return null;
+            }
+
+            return new UserResponse { Id = userId.Value, FirstName = request.FirstName, LastName = request.LastName, Email = request.Email, Role = "STUDENT" };
         }
     }
 }

@@ -20,9 +20,21 @@ namespace AssistQR.Api.Controllers
             this._tokenService = tokenService;
         }
 
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
+        {
+            var user = await _authService.RegisterStudentAsync(request, cancellationToken);
+            if (user == null)
+            {
+                return Conflict(new
+                {
+                    message = "An account with this email already exists."
+                });
+            }
 
-
-
+            return StatusCode(201, user);
+        }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)

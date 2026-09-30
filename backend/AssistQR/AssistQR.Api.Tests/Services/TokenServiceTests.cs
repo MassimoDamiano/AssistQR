@@ -27,6 +27,8 @@ namespace AssistQR.Api.Tests.Services
             var user = new AuthenticatedUser
             {
                 Id = 12,
+                FirstName = "Alice",
+                LastName = "Smith",
                 Email = "teacher@example.com",
                 Role = "TEACHER"
             };
