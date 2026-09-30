@@ -1,4 +1,4 @@
-import 'package:assistqr/features/auth/models/auth_user.dart';
+import 'auth_user.dart';
 
 class LoginResponse {
   final String accessToken;
@@ -17,9 +17,7 @@ class LoginResponse {
     return LoginResponse(
       accessToken: json['accessToken'] as String,
       tokenType: json['tokenType'] as String,
-      expiresAtUtc: DateTime.parse(
-        json['expiresAtUtc'] as String,
-      ),
+      expiresAtUtc: DateTime.parse(json['expiresAtUtc'] as String),
       user: AuthUser.fromJson(json['user'] as Map<String, dynamic>),
     );
   }

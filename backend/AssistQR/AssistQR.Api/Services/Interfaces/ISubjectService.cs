@@ -7,6 +7,7 @@ namespace AssistQR.Api.Services.Interfaces
     public interface ISubjectService
     {
         Task<SubjectResponse> CreateAsync(CreateSubjectRequest request, int teacherId, CancellationToken cancellationToken);
-            
+
+        Task<IReadOnlyList<SubjectResponse>> GetByTeacherIdAsync(int teacherId, CancellationToken cancellationToken);
     }
 }

@@ -214,8 +214,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 : const Text('Iniciar sesión'),
                           ),
                           const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               Text(
                                 '¿No tenés una cuenta?',

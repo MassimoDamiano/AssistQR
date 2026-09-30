@@ -17,12 +17,14 @@ namespace AssistQR.Api.Controllers
             _subjectService = subjectService;
         }
 
+
+
         [HttpPost]
         [Authorize(Roles = "TEACHER")]
         public async Task<ActionResult<SubjectResponse>> Create([FromBody] CreateSubjectRequest request, CancellationToken cancellationToken)
         {
-           var subjectId = User.FindFirstValue("sub");
-            if(!int.TryParse(subjectId, out var teacherId) || teacherId <= 0)
+            var subjectId = User.FindFirstValue("sub");
+            if (!int.TryParse(subjectId, out var teacherId) || teacherId <= 0)
             {
                 return Unauthorized();
             }
@@ -33,6 +35,19 @@ namespace AssistQR.Api.Controllers
 
             return StatusCode(StatusCodes.Status201Created, subject);
         }
-       
+
+        [HttpGet]
+        [Authorize(Roles = "TEACHER")]
+        public async Task<ActionResult<IReadOnlyList<SubjectResponse>>> GetByTeacherId(CancellationToken cancellationToken)
+        {
+            var subjectId = User.FindFirstValue("sub");
+            if (!int.TryParse(subjectId, out var teacherId) || teacherId <= 0)
+            {
+                return Unauthorized();
+            }
+            var subjects = await _subjectService.GetByTeacherIdAsync(teacherId, cancellationToken);
+            return Ok(subjects);
+        }
+
     }
 }

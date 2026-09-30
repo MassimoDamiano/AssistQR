@@ -40,6 +40,25 @@ namespace AssistQR.Api.Services
 
             return response;
         }
-        
+
+
+        public async Task<IReadOnlyList<SubjectResponse>> GetByTeacherIdAsync(int teacherId, CancellationToken cancellationToken)
+        {
+            if (teacherId <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(teacherId), "Teacher ID must be greater than zero.");
+            }
+            var subjects = await _subjectRepository.GetByTeacherIdAsync(teacherId, cancellationToken);
+            var response = subjects.Select(s => new SubjectResponse
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Description = s.Description,
+                TeacherId = s.TeacherId,
+                IsActive = s.IsActive
+            }).ToList();
+            return response;
+        }
+
     }
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../auth/models/auth_user.dart';
+import '../../auth/providers/auth_provider.dart';
+import '../../subjects/screens/teacher_subjects_screen.dart';
 
 class TeacherHomeScreen extends StatelessWidget {
   const TeacherHomeScreen({super.key, required this.user});
@@ -24,10 +27,33 @@ class TeacherHomeScreen extends StatelessWidget {
             const SizedBox(height: 4),
             Text(user.email, style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 28),
-            const _TeacherActionCard(
+            _TeacherActionCard(
               icon: Icons.menu_book_outlined,
               title: 'Mis materias',
               description: 'Consultá y administrá tus materias.',
+              onTap: () {
+                final accessToken = context
+                    .read<AuthProvider>()
+                    .loginResponse
+                    ?.accessToken;
+
+                if (accessToken == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('No hay una sesión activa.'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        TeacherSubjectsScreen(accessToken: accessToken),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 16),
             const _TeacherActionCard(
@@ -53,11 +79,13 @@ class _TeacherActionCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.description,
+    this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String description;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +93,7 @@ class _TeacherActionCard extends StatelessWidget {
       color: AppColors.surface,
       elevation: 1,
       child: ListTile(
+        onTap: onTap,
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
           backgroundColor: AppColors.primary.withValues(alpha: 0.12),
