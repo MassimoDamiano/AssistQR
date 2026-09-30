@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../student/screens/student_home_screen.dart';
 import '../../teacher/screens/teacher_home_screen.dart';
 import '../providers/auth_provider.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -98,6 +99,24 @@ class _LoginScreenState extends State<LoginScreen> {
       SnackBar(
         content: Text(authProvider.errorMessage ?? 'No se pudo iniciar sesión'),
         backgroundColor: AppColors.error,
+      ),
+    );
+  }
+
+  Future<void> _openRegister() async {
+    final email = await Navigator.of(context).push<String>(
+      MaterialPageRoute<String>(builder: (_) => const RegisterScreen()),
+    );
+
+    if (!mounted || email == null) {
+      return;
+    }
+
+    _emailController.text = email;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Cuenta creada. Ya podés iniciar sesión.'),
+        backgroundColor: AppColors.success,
       ),
     );
   }
@@ -223,7 +242,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 style: Theme.of(context).textTheme.bodyMedium,
                               ),
                               TextButton(
-                                onPressed: () {},
+                                onPressed: authProvider.isLoading
+                                    ? null
+                                    : _openRegister,
                                 child: const Text('Registrate'),
                               ),
                             ],

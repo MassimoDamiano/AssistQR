@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/login_request.dart';
 import '../models/login_response.dart';
+import '../models/register_request.dart';
 import '../services/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -30,6 +31,35 @@ class AuthProvider extends ChangeNotifier {
     } catch (error) {
       _errorMessage = error.toString().replaceFirst('Exception: ', '');
 
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final request = RegisterRequest(
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        password: password,
+      );
+
+      await _authService.register(request);
+      return true;
+    } catch (error) {
+      _errorMessage = error.toString().replaceFirst('Exception: ', '');
       return false;
     } finally {
       _isLoading = false;

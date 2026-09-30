@@ -25,15 +25,49 @@ void main() {
   testWidgets('permite mostrar y ocultar la contraseña', (tester) async {
     await tester.pumpWidget(const AssistQrApp());
 
-    TextField passwordField = tester.widget(
-      find.byKey(const Key('passwordField')),
+    final passwordInput = find.descendant(
+      of: find.byKey(const Key('passwordField')),
+      matching: find.byType(EditableText),
     );
+    EditableText passwordField = tester.widget(passwordInput);
     expect(passwordField.obscureText, isTrue);
 
     await tester.tap(find.byKey(const Key('passwordVisibilityButton')));
     await tester.pump();
 
-    passwordField = tester.widget(find.byKey(const Key('passwordField')));
+    passwordField = tester.widget(passwordInput);
     expect(passwordField.obscureText, isFalse);
+  });
+
+  testWidgets('abre el formulario de registro de estudiantes', (tester) async {
+    await tester.pumpWidget(const AssistQrApp());
+
+    await tester.ensureVisible(find.text('Registrate'));
+    await tester.tap(find.text('Registrate'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Registrate en AssistQR'), findsOneWidget);
+    expect(find.byKey(const Key('firstNameField')), findsOneWidget);
+    expect(find.byKey(const Key('lastNameField')), findsOneWidget);
+    expect(find.byKey(const Key('registerEmailField')), findsOneWidget);
+    expect(find.byKey(const Key('registerPasswordField')), findsOneWidget);
+    expect(find.byKey(const Key('confirmPasswordField')), findsOneWidget);
+  });
+
+  testWidgets('valida los campos obligatorios del registro', (tester) async {
+    await tester.pumpWidget(const AssistQrApp());
+
+    await tester.ensureVisible(find.text('Registrate'));
+    await tester.tap(find.text('Registrate'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('registerButton')));
+    await tester.tap(find.byKey(const Key('registerButton')));
+    await tester.pump();
+
+    expect(find.text('Ingresá tu nombre'), findsOneWidget);
+    expect(find.text('Ingresá tu apellido'), findsOneWidget);
+    expect(find.text('Ingresá tu correo electrónico'), findsOneWidget);
+    expect(find.text('Ingresá una contraseña'), findsOneWidget);
+    expect(find.text('Repetí tu contraseña'), findsOneWidget);
   });
 }
