@@ -1,6 +1,7 @@
 import 'package:assistqr/features/classes/models/teacher_class_summary.dart';
 import 'package:assistqr/features/classes/models/class_session.dart';
 import 'package:assistqr/features/classes/models/create_class_request.dart';
+import 'package:assistqr/features/classes/models/qr_class.dart';
 import 'package:assistqr/features/classes/providers/class_provider.dart';
 import 'package:assistqr/features/classes/services/class_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -60,6 +61,43 @@ void main() {
     expect(provider.createErrorMessage, 'No se pudo crear');
     expect(provider.isCreating, isFalse);
   });
+
+  test('genera y expone el QR devuelto por el backend', () async {
+    final qr = QrClass(
+      classSessionId: 42,
+      qrToken: 'token-temporal',
+      expiresAtUtc: DateTime.utc(2026, 10, 6, 21, 30),
+    );
+    final provider = ClassProvider(
+      classService: _FakeClassService(const [], qrClass: qr),
+    );
+
+    final success = await provider.generateQr(
+      classSessionId: 42,
+      accessToken: 'token',
+    );
+
+    expect(success, isTrue);
+    expect(provider.qrClass, same(qr));
+    expect(provider.qrErrorMessage, isNull);
+    expect(provider.isGeneratingQr, isFalse);
+  });
+
+  test('conserva el error HTTP 500 recibido al generar el QR', () async {
+    final provider = ClassProvider(
+      classService: _FakeClassService.qrError('HTTP 500 del backend'),
+    );
+
+    final success = await provider.generateQr(
+      classSessionId: 42,
+      accessToken: 'token',
+    );
+
+    expect(success, isFalse);
+    expect(provider.qrClass, isNull);
+    expect(provider.qrErrorMessage, 'HTTP 500 del backend');
+    expect(provider.isGeneratingQr, isFalse);
+  });
 }
 
 CreateClassRequest _request() {
@@ -105,15 +143,27 @@ TeacherClassSummary _classSummary({
 }
 
 class _FakeClassService extends ClassService {
-  _FakeClassService(this._classes, {this.createdClass}) : _error = null;
+  _FakeClassService(this._classes, {this.createdClass, this.qrClass})
+    : _error = null,
+      _qrError = null;
 
   _FakeClassService.error(this._error)
     : _classes = const [],
-      createdClass = null;
+      createdClass = null,
+      qrClass = null,
+      _qrError = null;
+
+  _FakeClassService.qrError(this._qrError)
+    : _classes = const [],
+      createdClass = null,
+      qrClass = null,
+      _error = null;
 
   final List<TeacherClassSummary> _classes;
   final String? _error;
   final ClassSession? createdClass;
+  final QrClass? qrClass;
+  final String? _qrError;
 
   @override
   Future<List<TeacherClassSummary>> getClasses(String accessToken) async {
@@ -132,5 +182,16 @@ class _FakeClassService extends ClassService {
       throw Exception(_error);
     }
     return createdClass!;
+  }
+
+  @override
+  Future<QrClass> generateQr({
+    required int classSessionId,
+    required String accessToken,
+  }) async {
+    if (_qrError != null) {
+      throw Exception(_qrError);
+    }
+    return qrClass!;
   }
 }

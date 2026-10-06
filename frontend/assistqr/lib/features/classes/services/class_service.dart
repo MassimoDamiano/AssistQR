@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../../../core/network/api_constants.dart';
 import '../models/class_session.dart';
 import '../models/create_class_request.dart';
+import '../models/qr_class.dart';
 import '../models/teacher_class_summary.dart';
 
 class ClassService {
@@ -64,6 +65,49 @@ class ClassService {
       default:
         throw Exception(
           'El servidor no pudo crear la clase. Código: ${response.statusCode}',
+        );
+    }
+  }
+
+  Future<QrClass> generateQr({
+    required int classSessionId,
+    required String accessToken,
+  }) async {
+    final uri = Uri.parse('${ApiConstants.baseUrl}/classes/$classSessionId/qr');
+    final response = await http
+        .post(
+          uri,
+          headers: _headers(accessToken),
+          body: jsonEncode({'durationSeconds': 30}),
+        )
+        .timeout(_timeout, onTimeout: _throwConnectionError);
+
+    if (response.statusCode == 200) {
+      final json =
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      return QrClass.fromJson(json);
+    }
+
+    switch (response.statusCode) {
+      case 400:
+        throw Exception('La solicitud para generar el QR no es válida.');
+      case 401:
+        throw Exception('La sesión venció. Volvé a iniciar sesión.');
+      case 403:
+        throw Exception('No tenés permisos para generar el QR de esta clase.');
+      case 404:
+        throw Exception('La clase ya no existe.');
+      case 409:
+        throw Exception(
+          'El backend rechazó el QR porque la clase está cerrada o no cumple las condiciones.',
+        );
+      case 500:
+        throw Exception(
+          'El backend respondió HTTP 500 al generar el QR. Revisá el log del servidor; no se generó ningún código válido.',
+        );
+      default:
+        throw Exception(
+          'No se pudo generar el QR. Código: ${response.statusCode}',
         );
     }
   }

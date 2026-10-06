@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/class_session.dart';
 import '../models/create_class_request.dart';
+import '../models/qr_class.dart';
 import '../models/teacher_class_summary.dart';
 import '../services/class_service.dart';
 
@@ -17,6 +18,9 @@ class ClassProvider extends ChangeNotifier {
   String? _errorMessage;
   String? _createErrorMessage;
   ClassSession? _createdClass;
+  QrClass? _qrClass;
+  bool _isGeneratingQr = false;
+  String? _qrErrorMessage;
 
   List<TeacherClassSummary> get classes => List.unmodifiable(_classes);
   bool get isLoading => _isLoading;
@@ -24,6 +28,9 @@ class ClassProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get createErrorMessage => _createErrorMessage;
   ClassSession? get createdClass => _createdClass;
+  QrClass? get qrClass => _qrClass;
+  bool get isGeneratingQr => _isGeneratingQr;
+  String? get qrErrorMessage => _qrErrorMessage;
 
   List<TeacherClassSummary> classesForSubject(int subjectId) {
     return List.unmodifiable(
@@ -70,6 +77,35 @@ class ClassProvider extends ChangeNotifier {
 
   void clearCreateError() {
     _createErrorMessage = null;
+  }
+
+  Future<bool> generateQr({
+    required int classSessionId,
+    required String accessToken,
+  }) async {
+    _isGeneratingQr = true;
+    _qrClass = null;
+    _qrErrorMessage = null;
+    notifyListeners();
+
+    try {
+      _qrClass = await _classService.generateQr(
+        classSessionId: classSessionId,
+        accessToken: accessToken,
+      );
+      return true;
+    } catch (error) {
+      _qrErrorMessage = _cleanError(error);
+      return false;
+    } finally {
+      _isGeneratingQr = false;
+      notifyListeners();
+    }
+  }
+
+  void clearQr() {
+    _qrClass = null;
+    _qrErrorMessage = null;
   }
 
   String _cleanError(Object error) {

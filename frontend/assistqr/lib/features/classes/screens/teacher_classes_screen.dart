@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../subjects/models/subject.dart';
 import '../models/teacher_class_summary.dart';
 import '../providers/class_provider.dart';
+import 'class_qr_screen.dart';
 import 'create_class_screen.dart';
 
 class TeacherClassesScreen extends StatefulWidget {
@@ -141,7 +142,20 @@ class _ClassesContent extends StatelessWidget {
             );
           }
 
-          return _ClassCard(classSummary: classes[index - 1]);
+          final classSummary = classes[index - 1];
+          return _ClassCard(
+            classSummary: classSummary,
+            onGenerateQr: classSummary.isClosed
+                ? null
+                : () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => ClassQrScreen(
+                        accessToken: accessToken,
+                        classSummary: classSummary,
+                      ),
+                    ),
+                  ),
+          );
         },
       ),
     );
@@ -149,9 +163,10 @@ class _ClassesContent extends StatelessWidget {
 }
 
 class _ClassCard extends StatelessWidget {
-  const _ClassCard({required this.classSummary});
+  const _ClassCard({required this.classSummary, this.onGenerateQr});
 
   final TeacherClassSummary classSummary;
+  final VoidCallback? onGenerateQr;
 
   @override
   Widget build(BuildContext context) {
@@ -185,6 +200,14 @@ class _ClassCard extends StatelessWidget {
               icon: Icons.groups_outlined,
               text:
                   '${classSummary.attendanceCount} ${classSummary.attendanceCount == 1 ? 'asistencia registrada' : 'asistencias registradas'}',
+            ),
+            const SizedBox(height: 16),
+            FilledButton.icon(
+              onPressed: onGenerateQr,
+              icon: const Icon(Icons.qr_code_rounded),
+              label: Text(
+                classSummary.isClosed ? 'Clase cerrada' : 'Generar QR',
+              ),
             ),
           ],
         ),
