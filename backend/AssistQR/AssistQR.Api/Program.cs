@@ -125,6 +125,10 @@ builder.Services.AddScoped<AssistQR.Api.Services.Interfaces.IAuthService, Assist
 builder.Services.AddScoped<Microsoft.AspNetCore.Identity.IPasswordHasher<AssistQR.Api.Models.AuthUser>,
     Microsoft.AspNetCore.Identity.PasswordHasher<AssistQR.Api.Models.AuthUser>>();
 
+builder.Services.AddScoped<AssistQR.Api.Repositories.Interfaces.IClassSessionRepository,
+    AssistQR.Api.Repositories.ClassSessionRepository>();
+builder.Services.AddScoped<AssistQR.Api.Services.Interfaces.IClassService, AssistQR.Api.Services.ClassService>();
+
 
 
 var app = builder.Build();

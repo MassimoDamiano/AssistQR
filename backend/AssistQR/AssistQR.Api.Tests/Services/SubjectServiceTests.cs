@@ -1,7 +1,7 @@
 ﻿using AssistQR.Api.DTOs.Subjects;
 using AssistQR.Api.Services;
 using System;
-using AssistQR.Api.Repositories.Interfaces; 
+using AssistQR.Api.Repositories.Interfaces;
 using AssistQR.Api.Models;
 
 namespace AssistQR.Api.Tests.Services;
@@ -18,18 +18,26 @@ public class SubjectServiceTests
         {
             return Task.FromResult(42);
         }
+
         public Task<IReadOnlyList<Subject>> GetByTeacherIdAsync(
-    int teacherId,
-    CancellationToken cancellationToken)
+            int teacherId,
+            CancellationToken cancellationToken)
         {
             return Task.FromResult<IReadOnlyList<Subject>>(
                 Array.Empty<Subject>());
+        }
+
+        public Task<Subject?> GetSubjectByIdAsync(
+            int subjectId,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult<Subject?>(null);
         }
     }
 
 
     [Fact]
-    
+
     public async Task CreateAsync_WhenTeacherIdIsZero_ThrowsArgumentOutOfRangeException()
     {
 
@@ -39,7 +47,7 @@ public class SubjectServiceTests
         CreateSubjectRequest subjectRequest = new CreateSubjectRequest();
 
         // Act & Assert
-        
+
         var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(async () =>
         {
             await subjectService.CreateAsync(subjectRequest, 0, CancellationToken.None);
@@ -53,7 +61,7 @@ public class SubjectServiceTests
         // Arrange
         ISubjectRepository subjectRepository = new FakeSubjectRepository();
         SubjectService subjectService = new SubjectService(subjectRepository);
-        CreateSubjectRequest subjectRequest = new CreateSubjectRequest{ Name = "Matematicas", Description = "Primer año" };
+        CreateSubjectRequest subjectRequest = new CreateSubjectRequest { Name = "Matematicas", Description = "Primer año" };
 
         // Act
         var result = await subjectService.CreateAsync(subjectRequest, 1, CancellationToken.None);
@@ -81,7 +89,9 @@ public class SubjectServiceTests
         });
     }
 
-    
-   
 
-}
+    }
+
+
+
+
