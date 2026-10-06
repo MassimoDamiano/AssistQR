@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/class_session.dart';
+import '../models/create_class_request.dart';
 import '../models/teacher_class_summary.dart';
 import '../services/class_service.dart';
 
@@ -11,11 +13,17 @@ class ClassProvider extends ChangeNotifier {
 
   List<TeacherClassSummary> _classes = const [];
   bool _isLoading = false;
+  bool _isCreating = false;
   String? _errorMessage;
+  String? _createErrorMessage;
+  ClassSession? _createdClass;
 
   List<TeacherClassSummary> get classes => List.unmodifiable(_classes);
   bool get isLoading => _isLoading;
+  bool get isCreating => _isCreating;
   String? get errorMessage => _errorMessage;
+  String? get createErrorMessage => _createErrorMessage;
+  ClassSession? get createdClass => _createdClass;
 
   List<TeacherClassSummary> classesForSubject(int subjectId) {
     return List.unmodifiable(
@@ -37,6 +45,31 @@ class ClassProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<bool> createClass(
+    CreateClassRequest request,
+    String accessToken,
+  ) async {
+    _isCreating = true;
+    _createErrorMessage = null;
+    _createdClass = null;
+    notifyListeners();
+
+    try {
+      _createdClass = await _classService.createClass(request, accessToken);
+      return true;
+    } catch (error) {
+      _createErrorMessage = _cleanError(error);
+      return false;
+    } finally {
+      _isCreating = false;
+      notifyListeners();
+    }
+  }
+
+  void clearCreateError() {
+    _createErrorMessage = null;
   }
 
   String _cleanError(Object error) {

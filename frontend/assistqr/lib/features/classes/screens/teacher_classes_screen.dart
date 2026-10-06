@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../subjects/models/subject.dart';
 import '../models/teacher_class_summary.dart';
 import '../providers/class_provider.dart';
+import 'create_class_screen.dart';
 
 class TeacherClassesScreen extends StatefulWidget {
   const TeacherClassesScreen({
@@ -31,6 +32,32 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
     });
   }
 
+  Future<void> _openCreateClass() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => CreateClassScreen(
+          accessToken: widget.accessToken,
+          subject: widget.subject,
+        ),
+      ),
+    );
+
+    if (!mounted || created != true) {
+      return;
+    }
+
+    await context.read<ClassProvider>().loadClasses(widget.accessToken);
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Clase creada correctamente.'),
+        backgroundColor: AppColors.success,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ClassProvider>();
@@ -47,8 +74,17 @@ class _TeacherClassesScreenState extends State<TeacherClassesScreen> {
           accessToken: widget.accessToken,
           provider: provider,
           classes: classes,
+          onCreateClass: widget.subject.isActive ? _openCreateClass : null,
         ),
       ),
+      floatingActionButton: widget.subject.isActive
+          ? FloatingActionButton.extended(
+              key: const Key('newClassButton'),
+              onPressed: _openCreateClass,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Nueva clase'),
+            )
+          : null,
     );
   }
 }
@@ -58,11 +94,13 @@ class _ClassesContent extends StatelessWidget {
     required this.accessToken,
     required this.provider,
     required this.classes,
+    required this.onCreateClass,
   });
 
   final String accessToken;
   final ClassProvider provider;
   final List<TeacherClassSummary> classes;
+  final VoidCallback? onCreateClass;
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +120,7 @@ class _ClassesContent extends StatelessWidget {
     if (classes.isEmpty) {
       return RefreshIndicator(
         onRefresh: () => provider.loadClasses(accessToken),
-        child: const _EmptyClassesState(),
+        child: _EmptyClassesState(onCreateClass: onCreateClass),
       );
     }
 
@@ -231,7 +269,9 @@ class _StatusLabel extends StatelessWidget {
 }
 
 class _EmptyClassesState extends StatelessWidget {
-  const _EmptyClassesState();
+  const _EmptyClassesState({required this.onCreateClass});
+
+  final VoidCallback? onCreateClass;
 
   @override
   Widget build(BuildContext context) {
@@ -253,10 +293,20 @@ class _EmptyClassesState extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'En la próxima etapa vas a poder crear una clase para esta materia.',
+          onCreateClass == null
+              ? 'La materia está inactiva y no permite crear clases.'
+              : 'Creá la primera clase para esta materia.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
+        if (onCreateClass != null) ...[
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: onCreateClass,
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Crear clase'),
+          ),
+        ],
       ],
     );
   }
