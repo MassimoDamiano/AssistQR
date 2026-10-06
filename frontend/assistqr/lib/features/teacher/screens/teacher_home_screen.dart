@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/models/auth_user.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../attendance/screens/attendance_placeholder_screen.dart';
 import '../../subjects/screens/teacher_subjects_screen.dart';
 
 class TeacherHomeScreen extends StatelessWidget {
@@ -52,11 +53,16 @@ class TeacherHomeScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 16),
-            const _TeacherActionCard(
+            _TeacherActionCard(
               icon: Icons.groups_outlined,
               title: 'Asistencias',
               description: 'Disponible cuando se integre el flujo de apertura.',
               isPending: true,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => const AttendancePlaceholderScreen(),
+                ),
+              ),
             ),
           ],
         ),
