@@ -11,18 +11,14 @@ class StudentHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inicio estudiante'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
-      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            Text('¡Hola!', style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 4),
-            Text(user.email, style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              '¡Hola, ${user.firstName}!',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             const SizedBox(height: 28),
             Container(
               padding: const EdgeInsets.all(24),
