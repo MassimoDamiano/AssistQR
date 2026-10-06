@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'features/auth/screens/login_screen.dart';
+import 'features/classes/providers/class_provider.dart';
 import 'features/subjects/providers/subject_provider.dart';
 
 class AssistQrApp extends StatelessWidget {
@@ -14,6 +15,7 @@ class AssistQrApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
+        ChangeNotifierProvider<ClassProvider>(create: (_) => ClassProvider()),
         ChangeNotifierProvider<SubjectProvider>(
           create: (_) => SubjectProvider(),
         ),

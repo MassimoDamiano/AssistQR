@@ -14,18 +14,14 @@ class TeacherHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Inicio docente'),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
-      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            Text('¡Hola!', style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(height: 4),
-            Text(user.email, style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              '¡Hola, ${user.firstName}!',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             const SizedBox(height: 28),
             _TeacherActionCard(
               icon: Icons.menu_book_outlined,
@@ -57,15 +53,10 @@ class TeacherHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const _TeacherActionCard(
-              icon: Icons.qr_code_rounded,
-              title: 'Generar QR',
-              description: 'Abrí una clase y generá su código temporal.',
-            ),
-            const SizedBox(height: 16),
-            const _TeacherActionCard(
               icon: Icons.groups_outlined,
               title: 'Asistencias',
-              description: 'Revisá los estudiantes presentes por clase.',
+              description: 'Disponible cuando se integre el flujo de apertura.',
+              isPending: true,
             ),
           ],
         ),
@@ -80,12 +71,14 @@ class _TeacherActionCard extends StatelessWidget {
     required this.title,
     required this.description,
     this.onTap,
+    this.isPending = false,
   });
 
   final IconData icon;
   final String title;
   final String description;
   final VoidCallback? onTap;
+  final bool isPending;
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +98,16 @@ class _TeacherActionCard extends StatelessWidget {
           padding: const EdgeInsets.only(top: 6),
           child: Text(description),
         ),
-        trailing: const Icon(Icons.chevron_right_rounded),
+        trailing: isPending
+            ? const Text(
+                'Próximamente',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            : const Icon(Icons.chevron_right_rounded),
       ),
     );
   }

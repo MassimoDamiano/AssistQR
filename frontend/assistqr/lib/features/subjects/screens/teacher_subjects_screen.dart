@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../classes/screens/teacher_classes_screen.dart';
 import '../models/subject.dart';
 import '../providers/subject_provider.dart';
 
@@ -89,7 +90,18 @@ class _SubjectsContent extends StatelessWidget {
             );
           }
 
-          return _SubjectCard(subject: provider.subjects[index - 1]);
+          final subject = provider.subjects[index - 1];
+          return _SubjectCard(
+            subject: subject,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => TeacherClassesScreen(
+                  accessToken: accessToken,
+                  subject: subject,
+                ),
+              ),
+            ),
+          );
         },
       ),
     );
@@ -97,9 +109,10 @@ class _SubjectsContent extends StatelessWidget {
 }
 
 class _SubjectCard extends StatelessWidget {
-  const _SubjectCard({required this.subject});
+  const _SubjectCard({required this.subject, required this.onTap});
 
   final Subject subject;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -108,39 +121,43 @@ class _SubjectCard extends StatelessWidget {
     return Card(
       color: AppColors.surface,
       elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-              foregroundColor: AppColors.primary,
-              child: const Icon(Icons.menu_book_outlined),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    subject.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  if (description != null && description.isNotEmpty) ...[
-                    const SizedBox(height: 6),
-                    Text(description),
-                  ],
-                  const SizedBox(height: 12),
-                  _StatusLabel(isActive: subject.isActive),
-                ],
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                foregroundColor: AppColors.primary,
+                child: const Icon(Icons.menu_book_outlined),
               ),
-            ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
-            ),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      subject.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    if (description != null && description.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      Text(description),
+                    ],
+                    const SizedBox(height: 12),
+                    _StatusLabel(isActive: subject.isActive),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textSecondary,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -197,7 +214,7 @@ class _EmptyState extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Cuando crees una materia, aparecerá en este listado.',
+          'Cuando te asignen una materia, aparecerá en este listado.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
